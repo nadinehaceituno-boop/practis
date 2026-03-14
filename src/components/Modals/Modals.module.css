@@ -1,0 +1,121 @@
+/* Overlays */
+.chatOverlay, .modalOverlay, .normOverlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.chatOverlay {
+  bottom: 24px; right: 24px; z-index: 9998;
+  align-items: flex-end; justify-content: flex-end; padding: 0;
+}
+.modalOverlay, .normOverlay {
+  background: rgba(10,30,60,.6); backdrop-filter: blur(6px);
+}
+.open { display: flex; }
+.openFlex { display: flex; }
+
+/* Modal Effects */
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* Chat */
+.chatWindow {
+  width: 370px; height: 520px; background: var(--white); border-radius: 20px;
+  box-shadow: var(--shadow-lg); display: flex; flex-direction: column; overflow: hidden;
+  animation: slideUp .3s ease; border: 1px solid var(--gray-mid);
+}
+.chatHdr {
+  background: linear-gradient(135deg, #128C7E, #25D366);
+  padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+}
+.chatAv {
+  width: 38px; height: 38px; background: rgba(255,255,255,.2); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+  border: 2px solid rgba(255,255,255,.3);
+}
+.chatHdrInfo { flex: 1; }
+.chName { font-size: 14px; font-weight: 700; color: #fff; }
+.chStatus { font-size: 11px; color: rgba(255,255,255,.8); display: flex; align-items: center; gap: 4px; }
+.pulseDot { width: 7px; height: 7px; background: #fff; border-radius: 50%; animation: pulse 1.5s infinite; }
+.chatX { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.2); border: none; color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.chatMsgs {
+  flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 9px; background: #ECE5DD;
+}
+.chatMsgs::-webkit-scrollbar { width: 3px; }
+.chatMsgs::-webkit-scrollbar-thumb { background: #c5c5c5; }
+.msg { max-width: 82%; padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+.botMsg { background: #fff; align-self: flex-start; border-bottom-left-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,.07); }
+.userMsg { background: #DCF8C6; align-self: flex-end; border-bottom-right-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,.07); }
+.msgTime { font-size: 10px; color: #999; text-align: right; margin-top: 3px; }
+.typing { display: flex; gap: 4px; padding: 9px 13px; background: #fff; border-radius: 14px; align-self: flex-start; border-bottom-left-radius: 3px; }
+.typing span { width: 7px; height: 7px; background: #aaa; border-radius: 50%; animation: typingA .8s infinite; }
+.typing span:nth-child(2) { animation-delay: .15s; }
+.typing span:nth-child(3) { animation-delay: .3s; }
+.chatInpArea { padding: 10px 12px; background: #fff; border-top: 1px solid var(--gray-mid); display: flex; gap: 7px; align-items: center; }
+.chatInp {
+  flex: 1; padding: 9px 13px; border-radius: 22px; border: 1.5px solid var(--gray-mid); font-size: 13px; background: var(--gray-soft); transition: border-color .2s; outline: none;
+}
+.chatInp:focus { border-color: var(--brand-blue2); }
+.chatSend { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #25D366, #128C7E); border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: transform .2s; }
+.chatSend:hover { transform: scale(1.08); }
+
+/* Ticket Modal */
+.modalBox {
+  background: var(--white); border-radius: 24px; width: 100%; max-width: 420px;
+  box-shadow: var(--shadow-lg); overflow: hidden; animation: slideUp .3s ease;
+}
+.modalTop {
+  background: linear-gradient(135deg, var(--blue-deep), var(--brand-blue2));
+  padding: 28px 28px 36px; text-align: center; position: relative;
+}
+.modalTop::after {
+  content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 22px;
+  background: var(--white); border-radius: 22px 22px 0 0;
+}
+.modalIconBig {
+  width: 60px; height: 60px; background: rgba(255,255,255,.18); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+  margin: 0 auto 12px; border: 2px solid rgba(255,255,255,.3);
+}
+.modalTop h3 { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: #fff; }
+.modalTop p { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 4px; }
+.modalContent { padding: 22px 26px; }
+.ticketIdBox { text-align: center; margin-bottom: 18px; }
+.ticketNum { font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 800; color: var(--blue-main); letter-spacing: 2px; }
+.ticketNumLbl { font-size: 11px; color: var(--gray-text); text-transform: uppercase; letter-spacing: .5px; }
+.tRows { display: flex; flex-direction: column; gap: 9px; }
+.tRow {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 10px 13px; background: var(--gray-soft); border-radius: 10px;
+}
+.trIco { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.trLbl { font-size: 10.5px; color: var(--gray-text); text-transform: uppercase; letter-spacing: .3px; }
+.trVal { font-size: 13px; font-weight: 600; color: var(--gray-dark); margin-top: 1px; }
+.qrWrap { margin: 14px 0; text-align: center; padding: 13px; background: var(--gray-soft); border-radius: 11px; }
+.qrSvg { width: 80px; height: 80px; margin: 0 auto 6px; }
+.qrNote { font-size: 11.5px; color: var(--gray-text); }
+.modalActs { display: flex; gap: 9px; margin-top: 14px; }
+.btnSec { flex: 1; padding: 10px; border-radius: 10px; background: var(--gray-soft); color: var(--gray-dark); font-size: 12.5px; font-weight: 600; border: 1.5px solid var(--gray-mid); cursor: pointer; transition: background .2s; }
+.btnSec:hover { background: var(--gray-mid); }
+.btnPri { flex: 2; padding: 10px; border-radius: 10px; background: linear-gradient(135deg, var(--brand-orange), #C85E00); color: #fff; font-size: 12.5px; font-weight: 700; border: none; cursor: pointer; }
+
+/* Norms Modal */
+.normBox {
+  background: var(--white); border-radius: 22px; width: 100%; max-width: 550px;
+  box-shadow: var(--shadow-lg); animation: slideUp .3s ease; overflow: hidden;
+}
+.normHdr { background: linear-gradient(135deg, #C85E00, var(--brand-orange)); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 11px; }
+.normHdrL { display: flex; align-items: center; gap: 11px; }
+.normIco { width: 42px; height: 42px; background: rgba(255,255,255,.2); border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; }
+.normHdrL h3 { font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; color: #fff; }
+.normHdrL p { font-size: 12px; color: rgba(255,255,255,.8); margin-top: 2px; }
+.normX { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.2); border: none; color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.normBody { padding: 24px; }
+.claimTa { width: 100%; padding: 10px 13px; border: 1.5px solid var(--gray-mid); border-radius: 10px; font-size: 12.5px; background: var(--gray-soft); resize: vertical; margin-bottom: 10px; outline: none; }
+.claimTa:focus { border-color: var(--brand-orange); }
+.btnOrange { width: 100%; padding: 10px; border-radius: 10px; background: linear-gradient(135deg, var(--brand-orange), #C85E00); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(255,122,0,.28); }
+.normResult { background: #FFF3EA; border: 1.5px solid rgba(255,122,0,.2); border-radius: 13px; padding: 16px 18px; margin-top: 14px; animation: slideUp .3s ease; }
+.normResultTitle { font-size: 13.5px; font-weight: 700; color: #C85E00; margin-bottom: 9px; }
+.normArts { display: flex; flex-direction: column; gap: 7px; }
+.normArt { padding: 10px 13px; background: #fff; border-radius: 9px; border-left: 3px solid var(--brand-orange); font-size: 12.5px; color: var(--gray-dark); line-height: 1.5; }
+.normArt strong { color: #C85E00; }
+
+@media(max-width:640px){ .chatWindow { width: calc(100vw - 20px); bottom: 10px; right: 10px; } }

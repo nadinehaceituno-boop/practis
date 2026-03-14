@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════
+   Header.module.css — HazmeCaso.pe
+   ═══════════════════════════════════════ */
+
+/* ── TOPBAR ── */
+.topbar {
+  background: #0B4F8A;
+  color: #BFDBF7;
+  font-size: 11px;
+  padding: 6px 0;
+}
+
+.topbarInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topbarInner span {
+  color: #BFDBF7;
+}
+
+.topbarInner div {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.topbarInner a {
+  color: #BFDBF7;
+  text-decoration: none;
+  font-size: 11px;
+  transition: color 0.15s;
+}
+
+.topbarInner a:hover {
+  color: #ffffff;
+}
+
+/* ── HEADER ── */
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #E8EAED;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.headerMain {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ── LOGO HAZMECASO ── */
+.logoHazme {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoIcon {
+  width: 44px;
+  height: 44px;
+}
+
+.logoTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logoName {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  line-height: 1;
+}
+
+.hazme {
+  font-size: 17px;
+  font-weight: 700;
+  color: #FF7A00;
+  letter-spacing: -0.3px;
+}
+
+.caso {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1BA8C9;
+  letter-spacing: -0.3px;
+}
+
+.pe {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0B6FB8;
+  letter-spacing: -0.3px;
+}
+
+.logoSub {
+  font-size: 9px;
+  font-weight: 500;
+  color: #9CA3AF;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* ── NAV ── */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  justify-content: center;
+}
+
+.navLink {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B7280;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  background: #F3F4F6;
+  color: #111827;
+}
+
+.navLink.active {
+  color: #1A6DB5;
+  background: #EBF3FB;
+}
+
+/* ── HEADER ACTIONS ── */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ── BOTÓN OSIPTEL ── */
+.btnOsiptel {
+  background: none;
+  border: 1px solid #E8EAED;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.15s, background 0.15s;
+  height: 40px;
+}
+
+.btnOsiptel:hover {
+  border-color: #41B6E6;
+  background: #EBF3FB;
+}
+
+.logoOsiptel {
+  height: 24px;
+  width: auto;
+}
+
+/* ── BOTÓN FONO AYUDA 1844 ── */
+.btnFonoAyuda {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FF7A00;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 7px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.btnFonoAyuda:hover {
+  background: #E86E00;
+}
+
+.btnFonoAyuda:active {
+  transform: scale(0.97);
+}
+
+.phoneIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.fonoLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+  gap: 1px;
+}
+
+.fonoTop {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.fonoNum {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* ══════════════════════════
+   RESPONSIVE
+   ══════════════════════════ */
+
+@media (max-width: 900px) {
+  .nav {
+    display: none;
+  }
+
+  .headerMain {
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbarInner div {
+    display: none;
+  }
+
+  .headerMain {
+    padding: 0 16px;
+    height: 58px;
+  }
+
+  .logoSub {
+    display: none;
+  }
+
+  .btnOsiptel {
+    display: none;
+  }
+
+  .hazme,
+  .caso,
+  .pe {
+    font-size: 15px;
+  }
+
+  .fonoTop {
+    display: none;
+  }
+
+  .fonoNum {
+    font-size: 14px;
+  }
+
+  .btnFonoAyuda {
+    padding: 7px 12px;
+    gap: 6px;
+  }
+}
