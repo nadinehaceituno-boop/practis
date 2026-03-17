@@ -11,9 +11,9 @@
 }
 
 .topbarInner {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -53,11 +53,12 @@
 }
 
 .headerMain {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 28px;
   height: 64px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 24px;
 }
@@ -123,7 +124,6 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  flex: 1;
   justify-content: center;
 }
 
@@ -157,6 +157,7 @@
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  justify-content: flex-end;
 }
 
 /* ── BOTÓN OSIPTEL ── */
@@ -239,12 +240,13 @@
    RESPONSIVE
    ══════════════════════════ */
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .nav {
     display: none;
   }
 
   .headerMain {
+    display: flex;
     justify-content: space-between;
     gap: 12px;
   }
@@ -256,8 +258,9 @@
   }
 
   .headerMain {
-    padding: 0 16px;
-    height: 58px;
+    padding: 0 12px;
+    height: 54px;
+    gap: 8px;
   }
 
   .logoSub {
@@ -271,7 +274,12 @@
   .hazme,
   .caso,
   .pe {
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .logoIcon {
+    width: 32px;
+    height: 32px;
   }
 
   .fonoTop {
@@ -279,11 +287,17 @@
   }
 
   .fonoNum {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .btnFonoAyuda {
-    padding: 7px 12px;
-    gap: 6px;
+    padding: 0 10px;
+    height: 36px;
+    gap: 4px;
+  }
+
+  .phoneIcon {
+    width: 14px;
+    height: 14px;
   }
 }

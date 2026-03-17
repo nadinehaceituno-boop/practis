@@ -283,7 +283,7 @@ export default function AtencionCards({ onChatOpen, onNormOpen }) {
   const [callOp, setCallOp] = useState('');
   const [opDropOpen, setOpDropOpen] = useState(false);
 
-  const WHATSAPP_NUMBER = '51900000000'; // ← reemplaza con el número real de Norma
+  const WHATSAPP_NUMBER = '+1 555 179 2260'; // ← reemplaza con el número real de Norma
 
   const openWhatsApp = () => {
     const msg = encodeURIComponent('Hola Norma, necesito ayuda con un reclamo ante mi operador.');
@@ -292,7 +292,9 @@ export default function AtencionCards({ onChatOpen, onNormOpen }) {
 
   const iniciarLlamada = () => {
     if (!callOp) { alert('Por favor selecciona un operador.'); return; }
+    const PH_NUMBER = '19110014067807301';
     alert(`✅ Conectando llamada asistida con ${callOp}...\n\n📞 La IA analizará la llamada en tiempo real.`);
+    window.location.href = `tel:${PH_NUMBER}`;
   };
 
   const selectedOp = OPERATORS.find(o => o.value === callOp);

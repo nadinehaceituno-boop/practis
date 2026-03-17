@@ -70,8 +70,8 @@ function App() {
 
       <HeroBanner />
 
-      <main className="main-wrap" style={{ maxWidth: 1440, margin: '0 auto', padding: '30px 28px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 22, marginBottom: 30 }}>
+      <main className="main-wrap">
+        <div className="content-grid">
           <Dashboard />
           <AtencionCards
             onChatOpen={() => setIsChatOpen(true)}

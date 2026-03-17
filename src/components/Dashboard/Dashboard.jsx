@@ -34,10 +34,7 @@ const RES = {
 };
 
 const KPIS = [
-  { label: 'Satisfacción', value: '86.2%', delta: '+2.1% vs mes anterior', up: true, acc: '#1A6DB5' },
-  { label: 'Resolución bot', value: '80.1%', delta: '+4.3% vs mes anterior', up: true, acc: '#15803D' },
-  { label: 'Tiempo prom.', value: '18 min', delta: '−5 min de mejora', up: false, acc: '#B45309' },
-  { label: 'Casos / mes', value: '12.4k', delta: '+8.2% crecimiento', up: true, acc: '#7C3AED' },
+
 ];
 
 const HBARS3 = [
@@ -550,18 +547,7 @@ export default function OsiptelDashboard() {
         ))}
       </div>
 
-      {/* KPIs */}
-      <div className="od-kpis">
-        {KPIS.map((k, i) => (
-          <div key={k.label} className="od-kpi" style={{ '--acc': k.acc, animationDelay: `${i * 0.05 + 0.05}s` }}>
-            <div className="od-kpi-lbl">{k.label}</div>
-            <div className="od-kpi-val">{k.value}</div>
-            <div className={`od-kpi-delta${k.up ? ' up' : ' dn'}`}>
-              {k.up ? '▲' : '▼'} {k.delta}
-            </div>
-          </div>
-        ))}
-      </div>
+
 
       {/* TABS */}
       <div className="od-tabs">

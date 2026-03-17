@@ -1,11 +1,12 @@
 import styles from './HeroBanner.module.css';
 
 const kpis = [
-  { val: '94.2%', lbl: 'Satisfacción' },
-  { val: '18 min', lbl: 'Tiempo prom.' },
-  { val: '12,450', lbl: 'Casos / mes' },
-  { val: '4', lbl: 'Operadores' },
+  { val: '86.2%', lbl: 'Satisfacción', delta: '+2.1% vs mes anterior' },
+  { val: '80.1%', lbl: 'Resolución bot', delta: '+4.3% vs mes anterior' },
+  { val: '18 min', lbl: 'Tiempo promedio', delta: '−5 min de mejora' },
+  { val: '12.4k', lbl: 'Casos / mes', delta: '+8.2% crecimiento' },
 ];
+
 
 const chips = [
   '🛡️ Respaldado por OSIPTEL',
