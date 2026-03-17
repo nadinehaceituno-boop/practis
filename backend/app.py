@@ -518,7 +518,7 @@ def chat_endpoint():
         err_str = str(e)
         print(f"❌ Gemini send_message error: {err_str[:300]}")
 
-        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "404" in err_str:
             # Intentar modelos alternativos de Gemini primero
             sesiones.pop(user_id, None)
             fallback_ok = False
@@ -537,9 +537,9 @@ def chat_endpoint():
 
             if not fallback_ok:
                 # Todos los modelos Gemini agotados — usar DeepSeek como agente 1
-                print("🔄 Todos Gemini agotados. DeepSeek toma el rol de agente 1.")
-                texto_usuario = mensaje if mensaje and mensaje not in {"[AUDIO_MSG]","[VER ADJUNTOS]"} else \
-                    ("[El usuario envió una nota de voz]" if audio_b64 else "[El usuario envió archivos adjuntos]")
+                print("🔄 Todos Gemini agotados / error 404. DeepSeek toma el rol de agente 1.")
+                texto_usuario = mensaje if mensaje and mensaje not in {"[AUDIO_MSG]","[VER ADJUNTOS]","[AUDIO]"} else \
+                    ("[El usuario envió una consulta multimedia]" if (audio_b64 or files) else "[El usuario se conectó]")
                 try:
                     idioma_fb = LANG_NAMES.get(lang, "español")
                     ds_r = deepseek.chat.completions.create(
@@ -548,8 +548,7 @@ def chat_endpoint():
                             {"role": "system", "content": (
                                 GEMINI_PROMPT +
                                 f"\n\nREGLA CRÍTICA: El usuario habla {idioma_fb}. "
-                                f"TODA tu respuesta debe estar en {idioma_fb.upper()}. "
-                                f"PROHIBIDO responder en español si el idioma es quechua o aymara."
+                                f"TODA tu respuesta debe estar en {idioma_fb.upper()}."
                             )},
                             {"role": "user", "content": f"[IDIOMA: {idioma_fb}] {texto_usuario}"},
                         ],
@@ -559,22 +558,20 @@ def chat_endpoint():
                     return jsonify({"respuesta": ds_r.choices[0].message.content, "fallback": "deepseek"})
                 except Exception as ds_e:
                     print(f"❌ DeepSeek fallback también falló: {ds_e}")
-                    m = re.search(r'"retryDelay":\s*"(\d+)s"', err_str)
-                    secs = int(m.group(1)) + 2 if m else 60
-                    return jsonify({"respuesta": f"🚨 Servicio temporalmente saturado. Espera {secs}s e intenta de nuevo. 🙏"})
+                    return jsonify({"respuesta": "¡Hola! Norma está recibiendo muchas consultas ahora mismo. 😅 ¿Podrías intentar escribirme de nuevo en un minuto? Estaré encantada de ayudarte con tu caso de telecomunicaciones. 🙏"})
 
         else:
-            # Error no relacionado con quota — limpiar sesión y reintentar una vez
+            # Error no relacionado con quota/404 — limpiar sesión y reintentar una vez
             sesiones.pop(user_id, None)
             chat, err = get_gemini_chat(user_id)
             if err:
-                return jsonify({"respuesta": err})
+                return jsonify({"respuesta": "Estoy teniendo un pequeño inconveniente técnico, pero ya estoy trabajando en ello. 🛠️ Por favor, prueba enviando tu mensaje una vez más."})
             try:
                 r1 = chat.send_message(parts_iniciales)
                 respuesta_gemini = r1.text
             except Exception as e2:
                 print(f"❌ Gemini reintento fallido: {e2}")
-                return jsonify({"respuesta": "Lo siento, ocurrió un error de conexión. Intenta de nuevo en un momento. 🙏"})
+                return jsonify({"respuesta": "Lo siento, mi conexión está un poco inestable. 😅 Por favor, intenta de nuevo en unos segundos. ¡No me iré a ningún lado!"})
 
     # ── Paso 3: detectar si Gemini marcó análisis legal ───────────────────────
     marca = re.search(r'\[NECESITA_ANALISIS_LEGAL:\s*(.+?)\]', respuesta_gemini, re.IGNORECASE)
@@ -605,8 +602,10 @@ def chat_endpoint():
                     "analisis_realizado": True
                 })
         else:
-            # DeepSeek y fallbacks fallaron — devolver respuesta de Gemini sin análisis
-            return jsonify({"respuesta": respuesta_visible})
+            # DeepSeek y fallbacks fallaron — devolver respuesta de Gemini aclarando que el análisis legal detallado tardará
+            return jsonify({
+                "respuesta": respuesta_visible + "\n\n(Aviso: Mi sistema de análisis legal profundo está un poco lento, pero puedo seguir conversando contigo sobre los detalles básicos de tu caso. 😊)"
+            })
 
     # Sin marca: devolver respuesta de Gemini directamente
     return jsonify({"respuesta": respuesta_gemini})

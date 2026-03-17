@@ -1,8 +1,41 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import styles from './Modals.module.css';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-const API_BASE = 'http://172.16.6.253:5000';
+// ─── Configuración Gemini Directa ───────────────────────────────────────────
+const GEMINI_KEY = 'AIzaSyAJDGhLvoJN0DqTUOmq8RENP_FteTX6tRY'; // Clave actualizada
+const genAI = new GoogleGenerativeAI(GEMINI_KEY);
+
+const NORMA_PROMPT = `
+Eres NORMA, la IA defensora de usuarios de telecomunicaciones en Perú — HazMeCasoPE.
+Tu estilo: **Amiga experta, directa, empática y MUY ÁGIL.**
+
+════════════════════════════════
+REGLAS DE ORO DE CONSERVACIÓN
+════════════════════════════════
+1. **Un paso a la vez**: No lances toda la ley de golpe. Haz preguntas cortas.
+2. **Brevedad Extrema**: Máximo 2 párrafos cortos. Usa negritas para lo vital.
+3. **Cero Aburrimiento**: Evita sonar como un contrato. Habla como alguien que quiere ayudar YA.
+4. **Empoderamiento**: Cuando sea el momento de la verdad, cita el artículo clave (ej: "Art. 66.9 Ley 29571") para que el usuario se sienta seguro.
+
+════════════════════════════════
+FLUJO DINÁMICO
+════════════════════════════════
+• Saludo + Emoción: "¡Qué rabia lo de tu recibo! Soy Norma. ¿Cómo te llamas?" (Y PARAS AHÍ).
+• Una vez sepas el nombre: "¿Con qué operador estás teniendo este lío, [Nombre]?" (Y PARAS AHÍ).
+• Diagnóstico + Ley: "Entiendo. Eso vulnera el **Art. 24 de la Ley 29571**. ¡No pueden ignorar tu reclamo! ¿Quieres que te diga qué pasos seguir?"
+
+════════════════════════════════
+BASE LEGAL RÁPIDA (Solo cita cuando sea relevante)
+════════════════════════════════
+- **Ley 29571**: Art. 66.9 (No corte si hay pago), Art. 24 (Atención eficaz), Prohibición de pago previo para reclamar.
+- **Ley 29733**: Art. 5 (Consentimiento para datos/spam).
+- **Res. 172-2022/OSIPTEL**: Plazos (3-20 días hábiles para resolver).
+- **Ley 27444**: Debido proceso y Silencio Administrativo.
+
+¡Haz que el usuario se sienta escuchado y protegido, no que está leyendo un manual! ✨⚖️
+`;
+
 const SESSION_KEY = 'norma_session_id';
 
 function getSessionId() {
@@ -305,49 +338,55 @@ export function ChatModal({ isOpen, onClose }) {
     setShowQuick(false);
 
     try {
-      const b64 = await blobToBase64(blob);
-      console.log('b64.length:', b64.length, '| preview:', b64.substring(0, 20));
-
-      const payload = {
-        session_id: sessionId,
-        mensaje: '',        // vacío — el audio ES el mensaje
-        audio_b64: b64,
-        lang,
-      };
-
-      // Verificar que audio_b64 está en el payload antes de enviar
-      const bodyStr = JSON.stringify(payload);
-      const parsed = JSON.parse(bodyStr);
-      console.log('✅ audio_b64 en payload:', !!parsed.audio_b64, '| len:', parsed.audio_b64?.length);
-      console.groupEnd();
-
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: bodyStr,
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction: NORMA_PROMPT,
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Historial para audio mejorado con contexto
+      const chatHistory = msgs.slice(1).map(m => ({
+        role: m.type === 'bot' ? 'model' : 'user',
+        parts: [{ text: m.text || "[Nota de Voz/Multimedia]" }],
+      }));
 
-      const data = await res.json();
+      const chat = model.startChat({ history: chatHistory });
+
+      // Obtener el MIME type real del blob para Gemini
+      const realMime = blob.type || 'audio/webm;codecs=opus';
+      console.log('🎤 Enviando audio a Gemini con MIME:', realMime);
+
+      const parts = [
+        { text: "El usuario ha enviado un mensaje de voz. Por favor, escúchalo con atención, transcríbelo mentalmente y responde a su consulta siguiendo tu personalidad de NORMA." },
+        {
+          inlineData: {
+            data: await blobToBase64(blob),
+            mimeType: realMime.split(';')[0], // Gemini prefiere el tipo base sin parámetros adicionales
+          }
+        }
+      ];
+
+      const result = await chat.sendMessage(parts);
+      const response = await result.response;
+      const text = response.text();
+
       setTyping(false);
       setMsgs(prev => [...prev, {
         id: Date.now() + 1,
         type: 'bot',
         time: fmt(),
-        text: data.respuesta || '(Sin respuesta del servidor)',
+        text: text || '(Norma escuchó el audio pero no pudo generar una respuesta clara. ¿Podrías repetirlo?)',
         lang: 'es',
       }]);
 
     } catch (err) {
-      console.error('❌ Error enviando audio:', err);
-      console.groupEnd();
+      console.error('❌ Error (Audio):', err);
+      const errorHint = err.message?.includes('429') ? '(Cuota agotada)' : '';
       setTyping(false);
       setMsgs(prev => [...prev, {
         id: Date.now() + 1,
         type: 'bot',
         time: fmt(),
-        text: `🚨 Error: ${err.message}. Intenta escribir tu consulta. 😊`,
+        text: `Estamos trabajando, una disculpa si no se conecta en este momento. ${errorHint} 🙏 Por favor, intenta de nuevo.`,
       }]);
     }
   }, [sessionId, lang]);
@@ -382,37 +421,56 @@ export function ChatModal({ isOpen, onClose }) {
     setShowQuick(false);
     setAnalyzing(attachments.length > 0);
 
-    const payload = { session_id: sessionId, mensaje: text || '', lang };
-
-    if (attachments.length > 0) {
-      const files = [];
-      for (const a of attachments) {
-        const b64 = await fileToBase64(a.file);
-        files.push({ name: a.file.name, type: a.type, data: b64 });
-      }
-      payload.files = files;
-    }
-
     try {
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction: NORMA_PROMPT,
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+
+      // Convertir msgs previos al formato de historial de Gemini ({ role, parts })
+      const chatHistory = msgs.slice(1).map(m => ({
+        role: m.type === 'bot' ? 'model' : 'user',
+        parts: [{ text: m.text || (m.audioUrl ? "[Nota de Voz]" : "[Archivo]") }],
+      }));
+
+      const chat = model.startChat({
+        history: chatHistory,
+      });
+
+      const parts = [];
+      if (attachments.length > 0) {
+        for (const a of attachments) {
+          const b64 = await fileToBase64(a.file);
+          parts.push({
+            inlineData: {
+              data: b64,
+              mimeType: a.type,
+            }
+          });
+        }
+      }
+      parts.push({ text: text || 'El usuario envió archivos.' });
+
+      const result = await chat.sendMessage(parts);
+      const response = await result.response;
+      const responseText = response.text();
+
       setTyping(false);
       setAnalyzing(false);
       setMsgs(prev => [...prev, {
         id: Date.now() + 1, type: 'bot', time: fmt(),
-        text: data.respuesta || '(Sin respuesta)', lang: 'es',
+        text: responseText || '(Sin respuesta)', lang: 'es',
       }]);
     } catch (err) {
+      console.error('❌ Error API Gemini:', err);
+      // Incluir una pista mínima del error para saber si es cuota o seguridad
+      const errorHint = err.message?.includes('429') ? '(Cuota agotada)' : (err.message?.includes('Safety') ? '(Bloqueo de seguridad)' : '');
+      
       setTyping(false);
       setAnalyzing(false);
       setMsgs(prev => [...prev, {
         id: Date.now() + 1, type: 'bot', time: fmt(),
-        text: '🚨 Hubo un problema de conexión. ¿Puedes intentar de nuevo? 🙏',
+        text: `Estamos trabajando, una disculpa si no se conecta. ${errorHint} 🙏 ¿Podrías intentar de nuevo en un momento?`,
       }]);
     }
   };
@@ -611,28 +669,29 @@ export function NormModal({ isOpen, onClose, initialClaim }) {
     setLoading(true);
     setError(null);
 
-    const payload = {
-      session_id: 'analysis_mode_' + Date.now(),
-      mensaje: `ANALIZA ESTE CASO LEGAL Y CITA LOS ARTÍCULOS APLICABLES CON EXPLICACIÓN SIMPLE: ${claim}`,
-      lang: 'es',
-    };
-
-    if (file) {
-      const b64 = await fileToBase64(file);
-      payload.files = [{ name: file.name, type: file.type, data: b64 }];
-    }
-
     try {
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction: "Eres un analista legal experto en telecomunicaciones peruanas. Analiza el caso y cita normas.",
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setAnalysis(data.respuesta);
+
+      const parts = [{ text: claim || 'Analiza este documento.' }];
+
+      if (file) {
+        const b64 = await fileToBase64(file);
+        parts.push({
+          inlineData: {
+            data: b64,
+            mimeType: file.type,
+          }
+        });
+      }
+
+      const result = await model.generateContent(parts);
+      const res = await result.response;
+      setAnalysis(res.text());
     } catch {
-      setError('No se pudo conectar con el motor de análisis. Verifica que el servidor esté activo.');
+      setError('No se pudo conectar directamente con el motor de análisis. Verifica tu conexión.');
     } finally {
       setLoading(false);
     }
